@@ -1,1 +1,6 @@
 .history/
+node_modules/
+
+src/
+platform-tools/
+package*.json
