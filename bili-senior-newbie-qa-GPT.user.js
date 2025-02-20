@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         哔哩哔哩硬核会员搜题GPT
 // @namespace    bili-senior-newbie-qa-GPT
-// @version      1.1
+// @version      1.2
 // @description  哔哩哔哩硬核会员搜题GPT
 // @author       HCLonely
 // @include      *://www.bilibili.com/h5/senior-newbie/qa*
@@ -46,11 +46,11 @@
     document.onfocusout = () => { };
   };
 
-  let { API_KEY, GPT_TYPE } = GM_getValue('API_KEY');
+  let { API_KEY, GPT_TYPE } = GM_getValue('API_KEY') || { API_KEY: '', GPT_TYPE: '' };
   let prevQuestion = '';
   GM_registerMenuCommand('设置 ChatAnywhere API 密钥', () => {
     const key = prompt('请输入 ChatAnywhere API 密钥：', API_KEY);
-    if (key !== null) {
+    if (key) {
       API_KEY = key;
       GPT_TYPE = 'ChatAnywhere';
       GM_setValue('API_KEY', { API_KEY, GPT_TYPE });
@@ -58,7 +58,7 @@
   });
   GM_registerMenuCommand('设置 DeepSeek API 密钥', () => {
     const key = prompt('请输入 DeepSeek API 密钥：', API_KEY);
-    if (key !== null) {
+    if (key) {
       API_KEY = key;
       GPT_TYPE = 'DeepSeek';
       GM_setValue('API_KEY', { API_KEY, GPT_TYPE });
