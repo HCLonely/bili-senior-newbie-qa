@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         哔哩哔哩硬核会员搜题GPT
 // @namespace    bili-senior-newbie-qa-GPT
-// @version      1.2
+// @version      1.3
 // @description  哔哩哔哩硬核会员搜题GPT
 // @author       HCLonely
 // @include      *://www.bilibili.com/h5/senior-newbie/qa*
@@ -167,7 +167,7 @@
         },
         data: JSON.stringify(requestData),
         onload: function (response) {
-          // console.log('API 响应:', response.responseText);
+          console.log('API 响应:', response.responseText);
           const data = JSON.parse(response.responseText);
           console.log('API 返回结果: ' + data.choices[0].message.content);
           resolve(data.choices[0].message.content);
