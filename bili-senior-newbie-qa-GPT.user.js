@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         哔哩哔哩硬核会员搜题GPT
 // @namespace    bili-senior-newbie-qa-GPT
-// @version      1.3
+// @version      1.4
 // @description  哔哩哔哩硬核会员搜题GPT
 // @author       HCLonely
 // @include      *://www.bilibili.com/h5/senior-newbie/qa*
@@ -71,15 +71,34 @@
     }
     console.clear();
     alert('启动后不要点击页面！');
+    document.addEventListener('click', start);
     document.dispatchEvent(new Event('click'));
   });
-  document.addEventListener('click', start);
 
   async function start(retry = 0) {
+    const score = $('.score_block .num').text()?.trim();
+    if (score) {
+      return GM_notification({
+        title: '哔哩哔哩硬核会员搜题GPT',
+        text: `题目可能已做完，分数为 ${score} 分。`,
+        timeout: 10000
+      });
+    }
     const delayTime = Math.floor(Math.random() * (30000 - 10000 + 1)) + 10000;
     console.log(`等待 ${delayTime / 1000} 秒后开始搜索下一题`);
     await sleep(delayTime);
-    const question = $('div.senior-question').find('.senior-question__qs,.senior-question__answer').toArray().map((v) => $(v).text().trim()).join('\n');
+    const question = $('div.senior-question.fade-out').find('.senior-question__qs,.senior-question__answer').toArray().map((v) => $(v).text().trim()).join('\n');
+    if (!(question.includes('A') || question.includes('B') || question.includes('C') || question.includes('D'))) {
+      if (retry > 3) {
+        GM_notification({
+          title: '哔哩哔哩硬核会员搜题GPT',
+          text: '没有检测到题目，可能已做完。',
+          timeout: 10000
+        });
+        return false;
+      }
+      return start(++retry);
+    }
     if (question === prevQuestion) {
       if (retry > 3) {
         return GM_notification({
@@ -88,21 +107,23 @@
           timeout: 10000
         });
       }
-      start(++retry);
+      return start(++retry);
     }
     console.log(question);
     await askGPT(question);
+    prevQuestion = question;
   }
 
   function askGPT(question, retry = 0) {
-    return callGPTAPI(`请仅给出答案\n${question}`).then((answer) => {
+    return callGPTAPI(`请仅给出答案\n${question}`).then(async (answer) => {
       let option = answer.match(/\w/)?.[0]?.toUpperCase();
       if (!['A', 'B', 'C', 'D'].includes(option)) {
         const letters = 'ABCD';
         option = letters[Math.floor(Math.random() * letters.length)];
       }
       console.log(`选择答案：${option}`);
-      buttonClick($('span.senior-question__answer--icon:contains(' + option + ')').parent()[0]);
+      await sleep(1000);
+      buttonClick($('div.fade-out span.senior-question__answer--icon:contains(' + option + ')').parent()[0]);
     }).catch(async (error) => {
       if (retry > 3) {
         return GM_notification({
@@ -111,8 +132,8 @@
           timeout: 10000
         });
       }
-      await sleep(5000);
-      askGPT(++retry);
+      await sleep(3000);
+      return askGPT(++retry);
     });
   }
 
