@@ -3,7 +3,7 @@
 // ==UserScript==
 // @name         哔哩哔哩硬核会员搜题
 // @namespace    bili-senior-newbie-qa
-// @version      1.0
+// @version      1.1
 // @description  哔哩哔哩硬核会员搜题
 // @author       HCLonely
 // @include      *://www.bilibili.com/h5/senior-newbie/qa*
@@ -230,8 +230,8 @@
       return Swal.fire('加载题库失败', '', 'error');
 
     document.addEventListener('click', async (e) => {
-      if (e.target === document.querySelector('.senior-question__qs')) {
-        const text = document.querySelector('.senior-question__qs').innerText;
+      if (e.target === document.querySelector('.fade-out .senior-question__qs')) {
+        const text = e.target.innerText;
         console.log(text);
         if (text) {
           const result = await search(text);
